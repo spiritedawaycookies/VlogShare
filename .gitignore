@@ -61,6 +61,7 @@ build/
 **/META-INF/
 **/readme.md
 **/log4j2.xml
+**/MyInfo.java
 *.properties
 **/lib/
 **/generatorConfig.xml

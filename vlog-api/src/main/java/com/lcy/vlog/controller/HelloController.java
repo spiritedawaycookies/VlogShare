@@ -33,7 +33,7 @@ public class HelloController {
 
     @Autowired
     private SMSUtils smsUtils;
-
+//测试发短信
     @GetMapping("sms")
     public Object sms() throws Exception {
 
