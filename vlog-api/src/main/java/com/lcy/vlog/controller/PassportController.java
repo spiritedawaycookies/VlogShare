@@ -50,7 +50,7 @@ public class PassportController extends BaseInfoProperties {
         //我的短信服务不能用[测试]
         String code = 123456+ "";
 //        smsUtils.sendSMS(MyInfo.getMobile(), code); //[测试]我的手机号 上线后删掉
-        smsUtils.sendSMS(mobile, code);
+//        smsUtils.sendSMS(mobile, code);
         log.info(code);
 
         // 把验证码放入到redis中，用于后续的验证
