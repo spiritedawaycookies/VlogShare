@@ -1,7 +1,7 @@
 package com.lcy.vlog.graceful.result;
 
 /**
- * 响应结果枚举，用于提供给GraceJSONResult返回给前端的
+ * 响应结果枚举，用于提供给GracefulJSONResult返回给前端的
  * 本枚举类中包含了很多的不同的状态码供使用，可以自定义
  * 便于更优雅的对状态码进行管理，一目了然
  */

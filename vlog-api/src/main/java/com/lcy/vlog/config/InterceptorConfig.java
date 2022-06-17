@@ -1,4 +1,4 @@
-package com.lcy.vlog;
+package com.lcy.vlog.config;
 
 import com.lcy.vlog.interceptor.PassportInterceptor;
 //import com.lcy.vlog.interceptor.UserTokenInterceptor;

@@ -74,7 +74,6 @@ public class PassportController extends BaseInfoProperties {
         String code = registerLoginBO.getSmsCode();
 
         // 1. 从redis中获得验证码进行校验是否匹配
-        //(我的腾讯云短信服务不能用) [测试]
         String redisCode = redis.get(MOBILE_SMSCODE + ":" + mobile);
         if (StringUtils.isBlank(redisCode) || !redisCode.equalsIgnoreCase(code)) {
             return GracefulJSONResult.errorCustom(ResponseStatusEnum.SMS_CODE_ERROR);
@@ -103,15 +102,15 @@ public class PassportController extends BaseInfoProperties {
     }
 
 
-//    @PostMapping("logout")
-//    public GracefulJSONResult logout(@RequestParam String userId,
-//                                  HttpServletRequest request) throws Exception {
-//
-//        // 后端只需要清除用户的token信息即可，前端也需要清除，清除本地app中的用户信息和token会话信息
-//        redis.del(REDIS_USER_TOKEN + ":" + userId);
-//
-//        return GracefulJSONResult.ok();
-//    }
+    @PostMapping("logout")
+    public GracefulJSONResult logout(@RequestParam String userId,
+                                  HttpServletRequest request) throws Exception {
+
+        // 后端只需要清除用户的token信息即可，前端也需要清除，清除本地app中的用户信息和token会话信息
+        redis.del(REDIS_USER_TOKEN + ":" + userId);
+
+        return GracefulJSONResult.ok();
+    }
 //
 //
 //    public Map<String, String> getErrors(BindingResult result) {
