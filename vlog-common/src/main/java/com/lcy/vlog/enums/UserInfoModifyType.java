@@ -1,14 +1,14 @@
 package com.lcy.vlog.enums;
 
-import com.lcy.vlog.exceptions.GraceException;
-import com.lcy.vlog.grace.result.ResponseStatusEnum;
+import com.lcy.vlog.exceptions.GracefulException;
+import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 
 /**
  * @Desc: 修改用户信息类型 枚举
  */
 public enum UserInfoModifyType {
     NICKNAME(1, "昵称"),
-    APINUM(2, "慕课号"),
+    USERNUM(2, "帐号"),
     SEX(3, "性别"),
     BIRTHDAY(4, "生日"),
     LOCATION(5, "所在地"),
@@ -24,12 +24,12 @@ public enum UserInfoModifyType {
 
     public static void checkUserInfoTypeIsRight(Integer type) {
         if (type != UserInfoModifyType.NICKNAME.type &&
-                type != UserInfoModifyType.APINUM.type &&
+                type != UserInfoModifyType.USERNUM.type &&
                 type != UserInfoModifyType.SEX.type &&
                 type != UserInfoModifyType.BIRTHDAY.type &&
                 type != UserInfoModifyType.LOCATION.type &&
                 type != UserInfoModifyType.DESC.type) {
-            GraceException.display(ResponseStatusEnum.USER_INFO_UPDATED_ERROR);
+            GracefulException.display(ResponseStatusEnum.USER_INFO_UPDATED_ERROR);
         }
     }
 }

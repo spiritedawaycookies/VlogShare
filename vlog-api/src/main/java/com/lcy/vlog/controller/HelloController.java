@@ -1,14 +1,12 @@
 package com.lcy.vlog.controller;
 
-import com.lcy.vlog.grace.result.GraceJSONResult;
-import com.lcy.vlog.grace.result.ResponseStatusEnum;
+import com.lcy.vlog.graceful.result.GracefulJSONResult;
 import com.lcy.vlog.model.Stu;
 import com.lcy.vlog.utils.SMSUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -26,9 +24,9 @@ public class HelloController {
         log.warn(stu.toString());
         log.error(stu.toString());
 
-        return GraceJSONResult.ok(stu);
-//        return GraceJSONResult.errorCustom(ResponseStatusEnum.SYSTEM_ERROR_GLOBAL);
-//        return GraceJSONResult.ok("Hello SpringBoot~");
+        return GracefulJSONResult.ok(stu);
+//        return GracefulJSONResult.errorCustom(ResponseStatusEnum.SYSTEM_ERROR_GLOBAL);
+//        return GracefulJSONResult.ok("Hello SpringBoot~");
     }
 
     @Autowired
@@ -40,6 +38,6 @@ public class HelloController {
         String code = "123456";
         smsUtils.sendSMS("", code);
 
-        return GraceJSONResult.ok();
+        return GracefulJSONResult.ok();
     }
 }

@@ -1,4 +1,4 @@
-package com.lcy.vlog.grace.result;
+package com.lcy.vlog.graceful.result;
 
 /**
  * 

@@ -1,9 +1,9 @@
 package com.lcy.vlog.controller;
 
 import com.lcy.vlog.base.BaseInfoProperties;
-import com.lcy.vlog.bo.RegistLoginBO;
-import com.lcy.vlog.grace.result.GraceJSONResult;
-import com.lcy.vlog.grace.result.ResponseStatusEnum;
+import com.lcy.vlog.bo.RegisterLoginBO;
+import com.lcy.vlog.graceful.result.GracefulJSONResult;
+import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 import com.lcy.vlog.pojo.Users;
 import com.lcy.vlog.service.UserService;
 import com.lcy.vlog.utils.IPUtil;
@@ -34,11 +34,11 @@ public class PassportController extends BaseInfoProperties {
     private UserService userService;
 
     @PostMapping("getSMSCode")
-    public GraceJSONResult getSMSCode(@RequestParam String mobile,
-                                      HttpServletRequest request) throws Exception {
+    public GracefulJSONResult getSMSCode(@RequestParam String mobile,
+                                         HttpServletRequest request) throws Exception {
 
         if (StringUtils.isBlank(mobile)) {
-            return GraceJSONResult.ok();
+            return GracefulJSONResult.ok();
         }
 
         // 获得用户ip，
@@ -46,35 +46,38 @@ public class PassportController extends BaseInfoProperties {
         // 根据用户ip进行限制，限制用户在60秒之内只能获得一次验证码
         redis.setnx60s(MOBILE_SMSCODE + ":" + userIp, userIp);
 
-        String code = (int)((Math.random() * 9 + 1) * 100000) + "";
-        smsUtils.sendSMS(MyInfo.getMobile(), code);
-//        smsUtils.sendSMS(mobile, code);
+//        String code = (int)((Math.random() * 9 + 1) * 100000) + "";
+        //我的短信服务不能用[测试]
+        String code = 123456+ "";
+//        smsUtils.sendSMS(MyInfo.getMobile(), code); //[测试]我的手机号 上线后删掉
+        smsUtils.sendSMS(mobile, code);
         log.info(code);
 
         // 把验证码放入到redis中，用于后续的验证
         redis.set(MOBILE_SMSCODE + ":" + mobile, code, 30 * 60);
 
-        return GraceJSONResult.ok();
+        return GracefulJSONResult.ok();
     }
 
     @PostMapping("login")
-    public GraceJSONResult login(@Valid @RequestBody RegistLoginBO registLoginBO,
+    public GracefulJSONResult login(@Valid @RequestBody RegisterLoginBO registerLoginBO,
 //                                 BindingResult result,    // 对代码有侵入性
-                                 HttpServletRequest request) throws Exception {
+                                    HttpServletRequest request) throws Exception {
 
-        // 0. 判断BindingResult中是否保存了错误的验证信息，如果有，则需要返回到前端
+        // 0. 判断BindingResult中是否保存了错误的验证信息，如果有，则需要返回到前端(现在放在了gracefulexceptionhandler 里面)
 //        if( result.hasErrors() ) {
 //            Map<String, String> map = getErrors(result);
-//            return GraceJSONResult.errorMap(map);
+//            return GracefulJSONResult.errorMap(map);
 //        }
 
-        String mobile = registLoginBO.getMobile();
-        String code = registLoginBO.getSmsCode();
+        String mobile = registerLoginBO.getMobile();
+        String code = registerLoginBO.getSmsCode();
 
         // 1. 从redis中获得验证码进行校验是否匹配
+        //(我的腾讯云短信服务不能用) [测试]
         String redisCode = redis.get(MOBILE_SMSCODE + ":" + mobile);
         if (StringUtils.isBlank(redisCode) || !redisCode.equalsIgnoreCase(code)) {
-            return GraceJSONResult.errorCustom(ResponseStatusEnum.SMS_CODE_ERROR);
+            return GracefulJSONResult.errorCustom(ResponseStatusEnum.SMS_CODE_ERROR);
         }
 
         // 2. 查询数据库，判断用户是否存在
@@ -96,29 +99,29 @@ public class PassportController extends BaseInfoProperties {
         BeanUtils.copyProperties(user, usersVO);
         usersVO.setUserToken(uToken);
 
-        return GraceJSONResult.ok(usersVO);
+        return GracefulJSONResult.ok(usersVO);
     }
 
 
-    @PostMapping("logout")
-    public GraceJSONResult logout(@RequestParam String userId,
-                                  HttpServletRequest request) throws Exception {
-
-        // 后端只需要清除用户的token信息即可，前端也需要清除，清除本地app中的用户信息和token会话信息
-        redis.del(REDIS_USER_TOKEN + ":" + userId);
-
-        return GraceJSONResult.ok();
-    }
-
-
+//    @PostMapping("logout")
+//    public GracefulJSONResult logout(@RequestParam String userId,
+//                                  HttpServletRequest request) throws Exception {
+//
+//        // 后端只需要清除用户的token信息即可，前端也需要清除，清除本地app中的用户信息和token会话信息
+//        redis.del(REDIS_USER_TOKEN + ":" + userId);
+//
+//        return GracefulJSONResult.ok();
+//    }
+//
+//
 //    public Map<String, String> getErrors(BindingResult result) {
 //        Map<String, String> map = new HashMap<>();
 //        List<FieldError> errorList = result.getFieldErrors();
-//        for (FieldError ff : errorList) {
+//        for (FieldError fieldError : errorList) {
 //            // 错误所对应的属性字段名
-//            String field = ff.getField();
+//            String field = fieldError.getField();
 //            // 错误的信息
-//            String msg = ff.getDefaultMessage();
+//            String msg = fieldError.getDefaultMessage();
 //            map.put(field, msg);
 //        }
 //        return map;

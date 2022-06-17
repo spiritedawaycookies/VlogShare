@@ -1,4 +1,4 @@
-package com.lcy.vlog.grace.result;
+package com.lcy.vlog.graceful.result;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ import java.util.Map;
  * @author LCY
  * @version V2.0
  */
-public class GraceJSONResult {
+public class GracefulJSONResult {
 
     // 响应业务状态码
     private Integer status;
@@ -35,17 +35,17 @@ public class GraceJSONResult {
      * @param data
      * @return
      */
-    public static GraceJSONResult ok(Object data) {
-        return new GraceJSONResult(data);
+    public static GracefulJSONResult ok(Object data) {
+        return new GracefulJSONResult(data);
     }
     /**
      * 成功返回，不带有数据的，直接调用ok方法，data无须传入（其实就是null）
      * @return
      */
-    public static GraceJSONResult ok() {
-        return new GraceJSONResult(ResponseStatusEnum.SUCCESS);
+    public static GracefulJSONResult ok() {
+        return new GracefulJSONResult(ResponseStatusEnum.SUCCESS);
     }
-    public GraceJSONResult(Object data) {
+    public GracefulJSONResult(Object data) {
         this.status = ResponseStatusEnum.SUCCESS.status();
         this.msg = ResponseStatusEnum.SUCCESS.msg();
         this.success = ResponseStatusEnum.SUCCESS.success();
@@ -57,8 +57,8 @@ public class GraceJSONResult {
      * 错误返回，直接调用error方法即可，当然也可以在ResponseStatusEnum中自定义错误后再返回也都可以
      * @return
      */
-    public static GraceJSONResult error() {
-        return new GraceJSONResult(ResponseStatusEnum.FAILED);
+    public static GracefulJSONResult error() {
+        return new GracefulJSONResult(ResponseStatusEnum.FAILED);
     }
 
     /**
@@ -66,8 +66,8 @@ public class GraceJSONResult {
      * @param map
      * @return
      */
-    public static GraceJSONResult errorMap(Map map) {
-        return new GraceJSONResult(ResponseStatusEnum.FAILED, map);
+    public static GracefulJSONResult errorMap(Map map) {
+        return new GracefulJSONResult(ResponseStatusEnum.FAILED, map);
     }
 
     /**
@@ -75,16 +75,16 @@ public class GraceJSONResult {
      * @param msg
      * @return
      */
-    public static GraceJSONResult errorMsg(String msg) {
-        return new GraceJSONResult(ResponseStatusEnum.FAILED, msg);
+    public static GracefulJSONResult errorMsg(String msg) {
+        return new GracefulJSONResult(ResponseStatusEnum.FAILED, msg);
     }
 
     /**
      * 错误返回，token异常，一些通用的可以在这里统一定义
      * @return
      */
-    public static GraceJSONResult errorTicket() {
-        return new GraceJSONResult(ResponseStatusEnum.TICKET_INVALID);
+    public static GracefulJSONResult errorTicket() {
+        return new GracefulJSONResult(ResponseStatusEnum.TICKET_INVALID);
     }
 
     /**
@@ -92,31 +92,31 @@ public class GraceJSONResult {
      * @param responseStatus
      * @return
      */
-    public static GraceJSONResult errorCustom(ResponseStatusEnum responseStatus) {
-        return new GraceJSONResult(responseStatus);
+    public static GracefulJSONResult errorCustom(ResponseStatusEnum responseStatus) {
+        return new GracefulJSONResult(responseStatus);
     }
-    public static GraceJSONResult exception(ResponseStatusEnum responseStatus) {
-        return new GraceJSONResult(responseStatus);
+    public static GracefulJSONResult exception(ResponseStatusEnum responseStatus) {
+        return new GracefulJSONResult(responseStatus);
     }
 
-    public GraceJSONResult(ResponseStatusEnum responseStatus) {
+    public GracefulJSONResult(ResponseStatusEnum responseStatus) {
         this.status = responseStatus.status();
         this.msg = responseStatus.msg();
         this.success = responseStatus.success();
     }
-    public GraceJSONResult(ResponseStatusEnum responseStatus, Object data) {
+    public GracefulJSONResult(ResponseStatusEnum responseStatus, Object data) {
         this.status = responseStatus.status();
         this.msg = responseStatus.msg();
         this.success = responseStatus.success();
         this.data = data;
     }
-    public GraceJSONResult(ResponseStatusEnum responseStatus, String msg) {
+    public GracefulJSONResult(ResponseStatusEnum responseStatus, String msg) {
         this.status = responseStatus.status();
         this.msg = msg;
         this.success = responseStatus.success();
     }
 
-    public GraceJSONResult() {
+    public GracefulJSONResult() {
     }
 
     public Integer getStatus() {

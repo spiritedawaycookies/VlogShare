@@ -1,6 +1,6 @@
 package com.lcy.vlog.exceptions;
 
-import com.lcy.vlog.grace.result.ResponseStatusEnum;
+import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 
 /**
  * 自定义异常

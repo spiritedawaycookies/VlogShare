@@ -1,4 +1,4 @@
-package com.lcy.vlog.grace.result;
+package com.lcy.vlog.graceful.result;
 
 /**
  * 响应结果枚举，用于提供给GraceJSONResult返回给前端的
@@ -11,27 +11,27 @@ public enum ResponseStatusEnum {
     FAILED(500, false, "Failed"),
 
     // 50x
-    UN_LOGIN(501,false,"Please login"),
-    TICKET_INVALID(502,false,"Session expired, please login again"),
-    NO_AUTH(503,false,"No privilege"),
-    MOBILE_ERROR(504,false,"SMS not sent, please try again"),
-    SMS_NEED_WAIT_ERROR(505,false,"SMS sent too frequent, please try again"),
-    SMS_CODE_ERROR(506,false,"Wrong SMS code"),
-    USER_FROZEN(507,false,"Account frozen, please contact admin"),
-    USER_UPDATE_ERROR(508,false,"User info update failed, please contact admin"),
-    USER_INACTIVE_ERROR(509,false,"Plase go to [账号设置], modify your info and activate"),
-    USER_INFO_UPDATED_ERROR(5091,false,"Info update failed"),
-    USER_INFO_UPDATED_NICKNAME_EXIST_ERROR(5092,false,"Nickname exists"),
-    USER_INFO_UPDATED_APINUM_EXIST_ERROR(5092,false,"Account name exists"),
-    USER_INFO_CANT_UPDATED_APINUM_ERROR(5092,false,"Cannot update account name"),
-    FILE_UPLOAD_NULL_ERROR(510,false,"File cannot be null"),
-    FILE_UPLOAD_FAILD(511,false,"File upload failed"),
-    FILE_FORMATTER_FAILD(512,false,"File format not supported"),
-    FILE_MAX_SIZE_500KB_ERROR(5131,false,"Only allow file up to 500kb"),
-    FILE_MAX_SIZE_2MB_ERROR(5132,false,"Only allow file up to 2MB"),
-    FILE_NOT_EXIST_ERROR(514,false,"Requested file not exists"),
-    USER_STATUS_ERROR(515,false,"User status error"),
-    USER_NOT_EXIST_ERROR(516,false,"User doesn't exist"),
+    UN_LOGIN(501, false, "Please login"),
+    TICKET_INVALID(502, false, "Session expired, please login again"),
+    NO_AUTH(503, false, "No privilege"),
+    MOBILE_ERROR(504, false, "SMS not sent, please try again"),
+    SMS_NEED_WAIT_ERROR(505, false, "SMS sent too frequent, please try again"),
+    SMS_CODE_ERROR(506, false, "Wrong SMS code"),
+    USER_FROZEN(507, false, "Account frozen, please contact admin"),
+    USER_UPDATE_ERROR(508, false, "User info update failed, please contact admin"),
+    USER_INACTIVE_ERROR(509, false, "Plase go to [账号设置], modify your info and activate"),
+    USER_INFO_UPDATED_ERROR(5091, false, "Info update failed"),
+    USER_INFO_UPDATED_NICKNAME_EXIST_ERROR(5092, false, "Nickname exists"),
+    USER_INFO_UPDATED_USERNUM_EXIST_ERROR(5092, false, "Account name exists"),
+    USER_INFO_CANT_UPDATED_USERNUM_ERROR(5092, false, "Cannot update account name"),
+    FILE_UPLOAD_NULL_ERROR(510, false, "File cannot be null"),
+    FILE_UPLOAD_FAILD(511, false, "File upload failed"),
+    FILE_FORMATTER_FAILD(512, false, "File format not supported"),
+    FILE_MAX_SIZE_500KB_ERROR(5131, false, "Only allow file up to 500kb"),
+    FILE_MAX_SIZE_2MB_ERROR(5132, false, "Only allow file up to 2MB"),
+    FILE_NOT_EXIST_ERROR(514, false, "Requested file not exists"),
+    USER_STATUS_ERROR(515, false, "User status error"),
+    USER_NOT_EXIST_ERROR(516, false, "User doesn't exist"),
 
     // 自定义系统级别异常 54x
     SYSTEM_INDEX_OUT_OF_BOUNDS(541, false, "System index out of bounds"),
@@ -96,9 +96,11 @@ public enum ResponseStatusEnum {
     public Integer status() {
         return status;
     }
+
     public Boolean success() {
         return success;
     }
+
     public String msg() {
         return msg;
     }
