@@ -31,6 +31,13 @@ public class UserInfoController extends BaseInfoProperties {
     @Autowired
     private UserService userService;
 
+    /**
+     * 用数据库计算粉丝数量很慢,会崩,用redis可以,而且是单线程, 线程安全
+     *
+     * @param userId
+     * @return
+     * @throws Exception
+     */
     @GetMapping("query")
     public GracefulJSONResult query(@RequestParam String userId) throws Exception {
 
@@ -38,6 +45,7 @@ public class UserInfoController extends BaseInfoProperties {
 
         UsersVO usersVO = new UsersVO();
         BeanUtils.copyProperties(user, usersVO);
+        usersVO.setCanUserNumBeUpdated(user.getCanUserNumBeUpdated());
 
         // 我的关注博主总数量
         String myFollowsCountsStr = redis.get(REDIS_MY_FOLLOWS_COUNTS + ":" + userId);
@@ -45,12 +53,12 @@ public class UserInfoController extends BaseInfoProperties {
         String myFansCountsStr = redis.get(REDIS_MY_FANS_COUNTS + ":" + userId);
         // 用户获赞总数，视频博主（点赞/喜欢）总和
 //        String likedVlogCountsStr = redis.get(REDIS_VLOG_BE_LIKED_COUNTS + ":" + userId);
-        String likedVlogerCountsStr = redis.get(REDIS_VLOGER_BE_LIKED_COUNTS + ":" + userId);
+        String likedVloggerCountsStr = redis.get(REDIS_VLOGER_BE_LIKED_COUNTS + ":" + userId);
 
         Integer myFollowsCounts = 0;
         Integer myFansCounts = 0;
         Integer likedVlogCounts = 0;
-        Integer likedVlogerCounts = 0;
+        Integer likedVloggerCounts = 0;
         Integer totalLikeMeCounts = 0;
 
         if (StringUtils.isNotBlank(myFollowsCountsStr)) {
@@ -62,10 +70,10 @@ public class UserInfoController extends BaseInfoProperties {
 //        if (StringUtils.isNotBlank(likedVlogCountsStr)) {
 //            likedVlogCounts = Integer.valueOf(likedVlogCountsStr);
 //        }
-        if (StringUtils.isNotBlank(likedVlogerCountsStr)) {
-            likedVlogerCounts = Integer.valueOf(likedVlogerCountsStr);
+        if (StringUtils.isNotBlank(likedVloggerCountsStr)) {
+            likedVloggerCounts = Integer.valueOf(likedVloggerCountsStr);
         }
-        totalLikeMeCounts = likedVlogCounts + likedVlogerCounts;
+        totalLikeMeCounts = likedVlogCounts + likedVloggerCounts;
 
         usersVO.setMyFollowsCounts(myFollowsCounts);
         usersVO.setMyFansCounts(myFansCounts);
@@ -76,9 +84,9 @@ public class UserInfoController extends BaseInfoProperties {
 
     @PostMapping("modifyUserInfo")
     public GracefulJSONResult modifyUserInfo(@RequestBody UpdatedUserBO updatedUserBO,
-                                          @RequestParam Integer type)
+                                             @RequestParam Integer type)
             throws Exception {
-
+//查看修改的是什么信息
         UserInfoModifyType.checkUserInfoTypeIsRight(type);
 
         Users newUserInfo = userService.updateUserInfo(updatedUserBO, type);
@@ -91,8 +99,8 @@ public class UserInfoController extends BaseInfoProperties {
 
     @PostMapping("modifyImage")
     public GracefulJSONResult modifyImage(@RequestParam String userId,
-                                       @RequestParam Integer type,
-                                       MultipartFile file) throws Exception {
+                                          @RequestParam Integer type,
+                                          MultipartFile file) throws Exception {
 
         if (type != FileTypeEnum.BGIMG.type && type != FileTypeEnum.FACE.type) {
             return GracefulJSONResult.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);

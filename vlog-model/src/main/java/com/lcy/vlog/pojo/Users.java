@@ -323,7 +323,7 @@ public class Users {
      *
      * @return can_user_num_be_updated - 慕课号能否被修改，1：默认，可以修改；0，无法修改
      */
-    public Integer getCanuserNumBeUpdated() {
+    public Integer getCanUserNumBeUpdated() {
         return canUserNumBeUpdated;
     }
 
@@ -332,7 +332,7 @@ public class Users {
      *
      * @param canUserNumBeUpdated 慕课号能否被修改，1：默认，可以修改；0，无法修改
      */
-    public void setCanuserNumBeUpdated(Integer canUserNumBeUpdated) {
+    public void setCanUserNumBeUpdated(Integer canUserNumBeUpdated) {
         this.canUserNumBeUpdated = canUserNumBeUpdated;
     }
 
