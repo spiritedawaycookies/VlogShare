@@ -61,7 +61,7 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
 
         vlog.setLikeCounts(0);
         vlog.setCommentsCounts(0);
-        vlog.setIsPrivate(YesOrNo.NO.type);
+        vlog.setIsPrivate(YesOrNo.YES.type);
 
         vlog.setCreatedTime(new Date());
         vlog.setUpdatedTime(new Date());
@@ -75,7 +75,7 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
                                             Integer page,
                                             Integer pageSize) {
 
-        PageHelper.startPage(page, pageSize);
+        PageHelper.startPage(page, pageSize); //面向切面,以下的list已经是分好页了
 
         Map<String, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(search)) {

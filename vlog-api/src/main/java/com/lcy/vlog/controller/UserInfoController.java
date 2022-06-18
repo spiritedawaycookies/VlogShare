@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
+
 @Slf4j
 @Api(tags = "UserInfoController 用户信息接口模块")
 @RequestMapping("userInfo")
@@ -102,7 +104,7 @@ public class UserInfoController extends BaseInfoProperties {
                                           @RequestParam Integer type,
                                           MultipartFile file) throws Exception {
 
-        if (type != FileTypeEnum.BGIMG.type && type != FileTypeEnum.FACE.type) {
+        if (!Objects.equals(type, FileTypeEnum.BGIMG.type) && !Objects.equals(type, FileTypeEnum.FACE.type)) {
             return GracefulJSONResult.errorCustom(ResponseStatusEnum.FILE_UPLOAD_FAILD);
         }
 
@@ -123,7 +125,7 @@ public class UserInfoController extends BaseInfoProperties {
         UpdatedUserBO updatedUserBO = new UpdatedUserBO();
         updatedUserBO.setId(userId);
 
-        if (type == FileTypeEnum.BGIMG.type) {
+        if (Objects.equals(type, FileTypeEnum.BGIMG.type)) {
             updatedUserBO.setBgImg(imgUrl);
         } else {
             updatedUserBO.setFace(imgUrl);

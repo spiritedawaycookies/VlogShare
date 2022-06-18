@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         user.setProvince("");
         user.setCity("");
         user.setDistrict("");
-        user.setDescription("这家伙很懒，什么都没留下~");
+        user.setDescription("This guy is lazy and left nothing~");
         user.setCanUserNumBeUpdated(YesOrNo.YES.type);
 
         user.setCreatedTime(new Date());
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
                 GracefulException.display(ResponseStatusEnum.USER_INFO_UPDATED_USERNUM_EXIST_ERROR);
             }
 
-            Users tempUser =  getUser(updatedUserBO.getId());
+            Users tempUser = getUser(updatedUserBO.getId());
             if (Objects.equals(tempUser.getCanUserNumBeUpdated(), YesOrNo.NO.type)) {
                 GracefulException.display(ResponseStatusEnum.USER_INFO_CANT_UPDATED_USERNUM_ERROR);
             }

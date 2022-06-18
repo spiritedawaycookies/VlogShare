@@ -1,6 +1,6 @@
 package com.lcy.vlog.interceptor;
 
-import com.lcy.vlog.controller.BaseInfoProperties;
+import com.lcy.vlog.base.BaseInfoProperties;
 import com.lcy.vlog.exceptions.GracefulException;
 import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 import com.lcy.vlog.utils.IPUtil;
