@@ -4,6 +4,7 @@ import com.lcy.vlog.base.BaseInfoProperties;
 import com.lcy.vlog.bo.VlogBO;
 import com.lcy.vlog.enums.YesOrNo;
 import com.lcy.vlog.graceful.result.GracefulJSONResult;
+import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 import com.lcy.vlog.service.VlogService;
 import com.lcy.vlog.utils.PagedGridResult;
 import io.swagger.annotations.Api;
@@ -31,9 +32,9 @@ public class VlogController extends BaseInfoProperties {
 
     @GetMapping("indexList")
     public GracefulJSONResult indexList(@RequestParam(defaultValue = "") String userId,//default是为了可选 否则必填
-                                     @RequestParam(defaultValue = "") String search,
-                                     @RequestParam Integer page,
-                                     @RequestParam Integer pageSize) {
+                                        @RequestParam(defaultValue = "") String search,
+                                        @RequestParam Integer page,
+                                        @RequestParam Integer pageSize) {
 
         if (page == null) {
             page = COMMON_START_PAGE;
@@ -48,23 +49,23 @@ public class VlogController extends BaseInfoProperties {
 
     @GetMapping("detail")
     public GracefulJSONResult detail(@RequestParam(defaultValue = "") String userId,
-                                  @RequestParam String vlogId) {
+                                     @RequestParam String vlogId) {
         return GracefulJSONResult.ok(vlogService.getVlogDetailById(userId, vlogId));
     }
 
 
     @PostMapping("changeToPrivate")
     public GracefulJSONResult changeToPrivate(@RequestParam String userId,
-                                           @RequestParam String vlogId) {
+                                              @RequestParam String vlogId) {
         vlogService.changeToPrivateOrPublic(userId,
-                                            vlogId,
-                                            YesOrNo.YES.type);
+                vlogId,
+                YesOrNo.YES.type);
         return GracefulJSONResult.ok();
     }
 
     @PostMapping("changeToPublic")
     public GracefulJSONResult changeToPublic(@RequestParam String userId,
-                                           @RequestParam String vlogId) {
+                                             @RequestParam String vlogId) {
         vlogService.changeToPrivateOrPublic(userId,
                 vlogId,
                 YesOrNo.NO.type);
@@ -72,11 +73,10 @@ public class VlogController extends BaseInfoProperties {
     }
 
 
-
     @GetMapping("myPublicList")
     public GracefulJSONResult myPublicList(@RequestParam String userId,
-                                     @RequestParam Integer page,
-                                     @RequestParam Integer pageSize) {
+                                           @RequestParam Integer page,
+                                           @RequestParam Integer pageSize) {
 
         if (page == null) {
             page = COMMON_START_PAGE;
@@ -86,16 +86,16 @@ public class VlogController extends BaseInfoProperties {
         }
 
         PagedGridResult gridResult = vlogService.queryMyVlogList(userId,
-                                                                page,
-                                                                pageSize,
-                                                                YesOrNo.NO.type);
+                page,
+                pageSize,
+                YesOrNo.NO.type);
         return GracefulJSONResult.ok(gridResult);
     }
 
     @GetMapping("myPrivateList")
     public GracefulJSONResult myPrivateList(@RequestParam String userId,
-                                        @RequestParam Integer page,
-                                        @RequestParam Integer pageSize) {
+                                            @RequestParam Integer page,
+                                            @RequestParam Integer pageSize) {
 
         if (page == null) {
             page = COMMON_START_PAGE;
@@ -113,8 +113,8 @@ public class VlogController extends BaseInfoProperties {
 
     @GetMapping("myLikedList")
     public GracefulJSONResult myLikedList(@RequestParam String userId,
-                                         @RequestParam Integer page,
-                                         @RequestParam Integer pageSize) {
+                                          @RequestParam Integer page,
+                                          @RequestParam Integer pageSize) {
 
         if (page == null) {
             page = COMMON_START_PAGE;
@@ -124,16 +124,19 @@ public class VlogController extends BaseInfoProperties {
         }
 
         PagedGridResult gridResult = vlogService.getMyLikedVlogList(userId,
-                                                                    page,
-                                                                    pageSize);
+                page,
+                pageSize);
         return GracefulJSONResult.ok(gridResult);
     }
 
 
     @PostMapping("like")
     public GracefulJSONResult like(@RequestParam String userId,
-                                 @RequestParam String vlogerId,
-                                 @RequestParam String vlogId) {
+                                   @RequestParam String vlogerId,
+                                   @RequestParam String vlogId) {
+        if (userId == null) return GracefulJSONResult.errorCustom(ResponseStatusEnum.USER_STATUS_ERROR);
+        if (vlogerId == null) return GracefulJSONResult.errorCustom(ResponseStatusEnum.USER_NOT_EXIST_ERROR);
+        if (vlogId == null) return GracefulJSONResult.errorCustom(ResponseStatusEnum.FILE_NOT_EXIST_ERROR);
 
         // 我点赞的视频，关联关系保存到数据库
         vlogService.userLikeVlog(userId, vlogId);
@@ -151,8 +154,8 @@ public class VlogController extends BaseInfoProperties {
 
     @PostMapping("unlike")
     public GracefulJSONResult unlike(@RequestParam String userId,
-                                @RequestParam String vlogerId,
-                                @RequestParam String vlogId) {
+                                     @RequestParam String vlogerId,
+                                     @RequestParam String vlogId) {
 
         // 我取消点赞的视频，关联关系删除
         vlogService.userUnLikeVlog(userId, vlogId);
@@ -171,8 +174,8 @@ public class VlogController extends BaseInfoProperties {
 
     @GetMapping("followList")
     public GracefulJSONResult followList(@RequestParam String myId,
-                                       @RequestParam Integer page,
-                                       @RequestParam Integer pageSize) {
+                                         @RequestParam Integer page,
+                                         @RequestParam Integer pageSize) {
 
         if (page == null) {
             page = COMMON_START_PAGE;
@@ -182,15 +185,15 @@ public class VlogController extends BaseInfoProperties {
         }
 
         PagedGridResult gridResult = vlogService.getMyFollowVlogList(myId,
-                                                                    page,
-                                                                    pageSize);
+                page,
+                pageSize);
         return GracefulJSONResult.ok(gridResult);
     }
 
     @GetMapping("friendList")
     public GracefulJSONResult friendList(@RequestParam String myId,
-                                      @RequestParam Integer page,
-                                      @RequestParam Integer pageSize) {
+                                         @RequestParam Integer page,
+                                         @RequestParam Integer pageSize) {
 
         if (page == null) {
             page = COMMON_START_PAGE;
@@ -200,8 +203,8 @@ public class VlogController extends BaseInfoProperties {
         }
 
         PagedGridResult gridResult = vlogService.getMyFriendVlogList(myId,
-                                                                    page,
-                                                                    pageSize);
+                page,
+                pageSize);
         return GracefulJSONResult.ok(gridResult);
     }
 }
