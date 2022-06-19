@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FansServiceImpl extends BaseInfoProperties implements FansService {
@@ -57,12 +54,12 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
         fans.setVlogerId(vlogerId);
 
         // 判断对方是否关注我，如果关注我，那么双方都要互为朋友关系
-        Fans vloger = queryFansRelationship(vlogerId, myId);
-        if (vloger != null) {
+        Fans followedMe = queryFansRelationship(vlogerId, myId);
+        if (followedMe != null) {
             fans.setIsFanFriendOfMine(YesOrNo.YES.type);
 
-            vloger.setIsFanFriendOfMine(YesOrNo.YES.type);
-            fansMapper.updateByPrimaryKeySelective(vloger);
+            followedMe.setIsFanFriendOfMine(YesOrNo.YES.type);
+            fansMapper.updateByPrimaryKeySelective(followedMe);
         } else {
             fans.setIsFanFriendOfMine(YesOrNo.NO.type);
         }
@@ -71,7 +68,7 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
 
         // 系统消息：关注
-        msgService.createMsg(myId, vlogerId, MessageEnum.FOLLOW_YOU.type, null);
+        // msgService.createMsg(myId, vlogerId, MessageEnum.FOLLOW_YOU.type, null);
     }
 
     public Fans queryFansRelationship(String fanId, String vlogerId) {
@@ -80,11 +77,11 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
         criteria.andEqualTo("vlogerId", vlogerId);
         criteria.andEqualTo("fanId", fanId);
 
-        List list =  fansMapper.selectByExample(example);
+        List list = fansMapper.selectByExample(example);
 
         Fans fan = null;
         if (list != null && list.size() > 0 && !list.isEmpty()) {
-            fan = (Fans)list.get(0);
+            fan = (Fans) list.get(0);
         }
 
         return fan;
@@ -96,7 +93,7 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
         // 判断我们是否朋友关系，如果是，则需要取消双方的关系
         Fans fan = queryFansRelationship(myId, vlogerId);
-        if (fan != null && fan.getIsFanFriendOfMine() == YesOrNo.YES.type) {
+        if (fan != null && Objects.equals(fan.getIsFanFriendOfMine(), YesOrNo.YES.type)) {
             // 抹除双方的朋友关系，自己的关系删除即可
             Fans pendingFan = queryFansRelationship(vlogerId, myId);
             pendingFan.setIsFanFriendOfMine(YesOrNo.NO.type);
@@ -109,8 +106,10 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
     @Override
     public boolean queryDoIFollowVloger(String myId, String vlogerId) {
-        Fans vloger = queryFansRelationship(myId, vlogerId);
-        return vloger != null;
+//        Fans vloger = queryFansRelationship(myId, vlogerId);
+//        return vloger != null;
+        String followRelationshipStr = redis.get(REDIS_FANS_AND_VLOGGER_RELATIONSHIP + ":" + myId + ":" + vlogerId);
+        return StringUtils.isNotBlank(followRelationshipStr) && followRelationshipStr.equalsIgnoreCase("1");
     }
 
     @Override
@@ -132,7 +131,7 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
                                        Integer page,
                                        Integer pageSize) {
 
-        /**
+        /*
          * <判断粉丝是否是我的朋友（互粉互关）>
          * 普通做法：
          * 多表关联+嵌套关联查询，这样会违反多表关联的规范，不可取，高并发下回出现性能问题
