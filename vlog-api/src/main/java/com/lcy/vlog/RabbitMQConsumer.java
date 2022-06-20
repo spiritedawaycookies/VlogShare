@@ -1,13 +1,13 @@
 package com.lcy.vlog;
 
 //import com.lcy.vlog.base.RabbitMQConfig;
-import com.lcy.vlog.config.RabbitMQConfig;
+import com.lcy.vlog.base.RabbitMQConfig;
 import com.lcy.vlog.enums.MessageEnum;
 import com.lcy.vlog.exceptions.GracefulException;
 import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 import com.lcy.vlog.mo.MessageMO;
 import com.lcy.vlog.service.MsgService;
-//import com.lcy.vlog.utils.JsonUtils;
+import com.lcy.vlog.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -25,41 +25,41 @@ public class RabbitMQConsumer {
     public void watchQueue(String payload, Message message) {
         log.info(payload);
 
-      //  MessageMO messageMO = JsonUtils.jsonToPojo(payload, MessageMO.class);
+       MessageMO messageMO = JsonUtils.jsonToPojo(payload, MessageMO.class);
 
         String routingKey = message.getMessageProperties().getReceivedRoutingKey();
         log.info(routingKey);
 
         // TODO: 下面这段代码可以优化，一个地方是参数优化，另外是枚举的判断优化
 
-//        if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.FOLLOW_YOU.enValue)) {
-//            msgService.createMsg(messageMO.getFromUserId(),
-//                    messageMO.getToUserId(),
-//                    MessageEnum.FOLLOW_YOU.type,
-//                    null);
-//        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.LIKE_VLOG.enValue)) {
-//            msgService.createMsg(messageMO.getFromUserId(),
-//                    messageMO.getToUserId(),
-//                    MessageEnum.FOLLOW_YOU.type,
-//                    messageMO.getMsgContent());
-//        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.COMMENT_VLOG.enValue)) {
-//            msgService.createMsg(messageMO.getFromUserId(),
-//                    messageMO.getToUserId(),
-//                    MessageEnum.COMMENT_VLOG.type,
-//                    messageMO.getMsgContent());
-//        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.REPLY_YOU.enValue)) {
-//            msgService.createMsg(messageMO.getFromUserId(),
-//                    messageMO.getToUserId(),
-//                    MessageEnum.REPLY_YOU.type,
-//                    messageMO.getMsgContent());
-//        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.LIKE_COMMENT.enValue)) {
-//            msgService.createMsg(messageMO.getFromUserId(),
-//                    messageMO.getToUserId(),
-//                    MessageEnum.LIKE_COMMENT.type,
-//                    messageMO.getMsgContent());
-//        } else {
-//            GracefulException.display(ResponseStatusEnum.SYSTEM_OPERATION_ERROR);
-//        }
+        if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.FOLLOW_YOU.enValue)) {
+            msgService.createMsg(messageMO.getFromUserId(),
+                    messageMO.getToUserId(),
+                    MessageEnum.FOLLOW_YOU.type,
+                    null);
+        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.LIKE_VLOG.enValue)) {
+            msgService.createMsg(messageMO.getFromUserId(),
+                    messageMO.getToUserId(),
+                    MessageEnum.FOLLOW_YOU.type,
+                    messageMO.getMsgContent());
+        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.COMMENT_VLOG.enValue)) {
+            msgService.createMsg(messageMO.getFromUserId(),
+                    messageMO.getToUserId(),
+                    MessageEnum.COMMENT_VLOG.type,
+                    messageMO.getMsgContent());
+        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.REPLY_YOU.enValue)) {
+            msgService.createMsg(messageMO.getFromUserId(),
+                    messageMO.getToUserId(),
+                    MessageEnum.REPLY_YOU.type,
+                    messageMO.getMsgContent());
+        } else if (routingKey.equalsIgnoreCase("sys.msg." + MessageEnum.LIKE_COMMENT.enValue)) {
+            msgService.createMsg(messageMO.getFromUserId(),
+                    messageMO.getToUserId(),
+                    MessageEnum.LIKE_COMMENT.type,
+                    messageMO.getMsgContent());
+        } else {
+            GracefulException.display(ResponseStatusEnum.SYSTEM_OPERATION_ERROR);
+        }
 
     }
 

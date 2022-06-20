@@ -1,4 +1,4 @@
-package com.lcy.vlog.config;
+package com.lcy.vlog.base;
 
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;

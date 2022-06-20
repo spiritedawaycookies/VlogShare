@@ -11,6 +11,8 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,6 +22,7 @@ import java.util.List;
 @Api(tags = "VlogController 短视频相关业务功能的接口")
 @RequestMapping("vlog")
 @RestController
+@RefreshScope
 public class VlogController extends BaseInfoProperties {
 
     @Autowired
@@ -129,7 +132,8 @@ public class VlogController extends BaseInfoProperties {
                 pageSize);
         return GracefulJSONResult.ok(gridResult);
     }
-
+    @Value("${nacos.counts}")
+    private Integer nacosCounts;
 
     @PostMapping("like")
     public GracefulJSONResult like(@RequestParam String userId,
@@ -139,8 +143,6 @@ public class VlogController extends BaseInfoProperties {
         if (vlogerId == null) return GracefulJSONResult.errorCustom(ResponseStatusEnum.USER_NOT_EXIST_ERROR);
         if (vlogId == null) return GracefulJSONResult.errorCustom(ResponseStatusEnum.FILE_NOT_EXIST_ERROR);
 
-        // 我点赞的视频，关联关系保存到数据库
-        vlogService.userLikeVlog(userId, vlogId);
 
         // 点赞后，视频和视频发布者的获赞都会 +1
         redis.increment(REDIS_VLOGER_BE_LIKED_COUNTS + ":" + vlogerId, 1);
@@ -156,14 +158,20 @@ public class VlogController extends BaseInfoProperties {
         String countsStr = redis.get(REDIS_VLOG_BE_LIKED_COUNTS + ":" + vlogId);
         log.info("======" + REDIS_VLOG_BE_LIKED_COUNTS + ":" + vlogId + "======");
         Integer counts = 0;
-//        if (StringUtils.isNotBlank(countsStr)) {
-//            counts = Integer.valueOf(countsStr);
-//            if (counts >= nacosCounts) {
-//                vlogService.flushCounts(vlogId, counts);
-//            }
-//        }
-//
+        Integer oldCounts=0;
+        if(redis.get(REDIS_VLOG_OLD_LIKED_COUNTS+":"+vlogId)!=null) {
+            oldCounts = Integer.valueOf(redis.get(REDIS_VLOG_OLD_LIKED_COUNTS + ":" + vlogId));
+        }
+        if (StringUtils.isNotBlank(countsStr)) {
+            counts = Integer.valueOf(countsStr);
+            if (counts-oldCounts >= nacosCounts) {
+                vlogService.flushCounts(vlogId, counts);
+            }
+        }
 
+
+        // 我点赞的视频，关联关系保存到数据库
+        vlogService.userLikeVlog(userId, vlogId);
         return GracefulJSONResult.ok();
     }
 

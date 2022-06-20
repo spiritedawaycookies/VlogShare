@@ -2,21 +2,25 @@ package com.lcy.vlog.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.lcy.vlog.base.BaseInfoProperties;
+import com.lcy.vlog.base.RabbitMQConfig;
 import com.lcy.vlog.bo.VlogBO;
 import com.lcy.vlog.enums.MessageEnum;
 import com.lcy.vlog.enums.YesOrNo;
 import com.lcy.vlog.mapper.MyLikedVlogMapper;
 import com.lcy.vlog.mapper.VlogMapper;
 import com.lcy.vlog.mapper.VlogMapperCustom;
+import com.lcy.vlog.mo.MessageMO;
 import com.lcy.vlog.pojo.MyLikedVlog;
 import com.lcy.vlog.pojo.Vlog;
 import com.lcy.vlog.service.FansService;
 import com.lcy.vlog.service.MsgService;
 import com.lcy.vlog.service.VlogService;
+import com.lcy.vlog.utils.JsonUtils;
 import com.lcy.vlog.utils.PagedGridResult;
 import com.lcy.vlog.vo.IndexVlogVO;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +51,8 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
 
     @Autowired
     private Sid sid;
+    @Autowired
+    public RabbitTemplate rabbitTemplate;
 
     @Transactional
     @Override
@@ -211,10 +217,19 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
         Map msgContent = new HashMap();
         msgContent.put("vlogId", vlogId);
         msgContent.put("vlogCover", vlog.getCover());
-        msgService.createMsg(userId,
-                            vlog.getVlogerId(),
-                            MessageEnum.LIKE_VLOG.type,
-                            msgContent);
+//        msgService.createMsg(userId,
+//                            vlog.getVlogerId(),
+//                            MessageEnum.LIKE_VLOG.type,
+//                            msgContent);
+        // MQ异步解耦
+        MessageMO messageMO = new MessageMO();
+        messageMO.setFromUserId(userId);
+        messageMO.setToUserId(vlog.getVlogerId());
+        messageMO.setMsgContent(msgContent);
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_MSG,
+                "sys.msg." + MessageEnum.LIKE_VLOG.enValue,
+                JsonUtils.objectToJson(messageMO));
     }
 
     @Override
@@ -304,5 +319,17 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
         }
 
         return setterPagedGrid(list, page);
+    }
+    @Transactional
+    @Override
+    public void flushCounts(String vlogId, Integer counts) {
+
+        Vlog vlog = new Vlog();
+        vlog.setId(vlogId);
+        vlog.setLikeCounts(counts);
+
+        vlogMapper.updateByPrimaryKeySelective(vlog);
+        redis.set(REDIS_VLOG_OLD_LIKED_COUNTS+":"+vlogId, String.valueOf(counts));
+
     }
 }

@@ -2,6 +2,7 @@ package com.lcy.vlog.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.lcy.vlog.base.BaseInfoProperties;
+import com.lcy.vlog.base.RabbitMQConfig;
 import com.lcy.vlog.bo.CommentBO;
 import com.lcy.vlog.enums.MessageEnum;
 import com.lcy.vlog.enums.YesOrNo;
@@ -10,15 +11,18 @@ import com.lcy.vlog.exceptions.MyCustomException;
 import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 import com.lcy.vlog.mapper.CommentMapper;
 import com.lcy.vlog.mapper.CommentMapperCustom;
+import com.lcy.vlog.mo.MessageMO;
 import com.lcy.vlog.pojo.Comment;
 import com.lcy.vlog.pojo.Vlog;
 import com.lcy.vlog.service.CommentService;
 import com.lcy.vlog.service.MsgService;
 import com.lcy.vlog.service.VlogService;
+import com.lcy.vlog.utils.JsonUtils;
 import com.lcy.vlog.utils.PagedGridResult;
 import com.lcy.vlog.vo.CommentVO;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +48,8 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
 
     @Autowired
     private Sid sid;
+    @Autowired
+    public RabbitTemplate rabbitTemplate;
 
     @Override
     public CommentVO createComment(CommentBO commentBO) {
@@ -83,17 +89,27 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
         msgContent.put("commentId", commentId);
         msgContent.put("commentContent", commentBO.getContent());
         Integer type = MessageEnum.COMMENT_VLOG.type;
+        String routeType = MessageEnum.COMMENT_VLOG.enValue;
         if (StringUtils.isNotBlank(commentBO.getFatherCommentId()) &&
                 !commentBO.getFatherCommentId().equalsIgnoreCase("0") ) {
             type = MessageEnum.REPLY_YOU.type;
+            routeType = MessageEnum.REPLY_YOU.enValue;
         }
 
-        msgService.createMsg(commentBO.getCommentUserId(),
-                commentBO.getVlogerId(),
-                type,
-                msgContent);
+//        msgService.createMsg(commentBO.getCommentUserId(),
+//                commentBO.getVlogerId(),
+//                type,
+//                msgContent);
 
-
+        // MQ异步解耦
+        MessageMO messageMO = new MessageMO();
+        messageMO.setFromUserId(commentBO.getCommentUserId());
+        messageMO.setToUserId(commentBO.getVlogerId());
+        messageMO.setMsgContent(msgContent);
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_MSG,
+                "sys.msg." + routeType,
+                JsonUtils.objectToJson(messageMO));
         return commentVO;
     }
 

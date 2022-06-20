@@ -1,6 +1,6 @@
 package com.lcy.vlog.controller;
 
-import com.lcy.vlog.config.RabbitMQConfig;
+import com.lcy.vlog.base.RabbitMQConfig;
 import com.lcy.vlog.graceful.result.GracefulJSONResult;
 import com.lcy.vlog.model.Stu;
 import com.lcy.vlog.utils.SMSUtils;

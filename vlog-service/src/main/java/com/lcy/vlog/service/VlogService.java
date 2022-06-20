@@ -4,6 +4,7 @@ import com.lcy.vlog.bo.VlogBO;
 import com.lcy.vlog.pojo.Vlog;
 import com.lcy.vlog.utils.PagedGridResult;
 import com.lcy.vlog.vo.IndexVlogVO;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface VlogService {
 
@@ -82,4 +83,6 @@ public interface VlogService {
      */
     public Vlog getVlog(String id);
 
+    @Transactional
+    void flushCounts(String vlogId, Integer counts);
 }

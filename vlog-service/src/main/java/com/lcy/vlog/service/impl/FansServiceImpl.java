@@ -2,6 +2,7 @@ package com.lcy.vlog.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.lcy.vlog.base.BaseInfoProperties;
+import com.lcy.vlog.base.RabbitMQConfig;
 import com.lcy.vlog.bo.VlogBO;
 import com.lcy.vlog.enums.MessageEnum;
 import com.lcy.vlog.enums.YesOrNo;
@@ -9,17 +10,20 @@ import com.lcy.vlog.mapper.FansMapper;
 import com.lcy.vlog.mapper.FansMapperCustom;
 import com.lcy.vlog.mapper.VlogMapper;
 import com.lcy.vlog.mapper.VlogMapperCustom;
+import com.lcy.vlog.mo.MessageMO;
 import com.lcy.vlog.pojo.Fans;
 import com.lcy.vlog.pojo.Vlog;
 import com.lcy.vlog.service.FansService;
 import com.lcy.vlog.service.MsgService;
 import com.lcy.vlog.service.VlogService;
+import com.lcy.vlog.utils.JsonUtils;
 import com.lcy.vlog.utils.PagedGridResult;
 import com.lcy.vlog.vo.FansVO;
 import com.lcy.vlog.vo.IndexVlogVO;
 import com.lcy.vlog.vo.VlogerVO;
 import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +45,8 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
     @Autowired
     private Sid sid;
+    @Autowired
+    public RabbitTemplate rabbitTemplate;
 
     @Transactional
     @Override
@@ -68,7 +74,16 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
 
         // 系统消息：关注
-         msgService.createMsg(myId, vlogerId, MessageEnum.FOLLOW_YOU.type, null);
+       //  msgService.createMsg(myId, vlogerId, MessageEnum.FOLLOW_YOU.type, null);
+        // 优化：使用mq异步解耦
+        MessageMO messageMO = new MessageMO();
+        messageMO.setFromUserId(myId);
+        messageMO.setToUserId(vlogerId);
+        // 优化：使用mq异步解耦
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_MSG,
+                "sys.msg." + MessageEnum.FOLLOW_YOU.enValue,
+                JsonUtils.objectToJson(messageMO));
     }
 
     public Fans queryFansRelationship(String fanId, String vlogerId) {
