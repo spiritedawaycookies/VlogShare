@@ -207,14 +207,14 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
 
 
 //        // 系统消息：点赞短视频
-//        Vlog vlog = this.getVlog(vlogId);
-//        Map msgContent = new HashMap();
-//        msgContent.put("vlogId", vlogId);
-//        msgContent.put("vlogCover", vlog.getCover());
-//        msgService.createMsg(userId,
-//                            vlog.getVlogerId(),
-//                            MessageEnum.LIKE_VLOG.type,
-//                            msgContent);
+        Vlog vlog = this.getVlog(vlogId);
+        Map msgContent = new HashMap();
+        msgContent.put("vlogId", vlogId);
+        msgContent.put("vlogCover", vlog.getCover());
+        msgService.createMsg(userId,
+                            vlog.getVlogerId(),
+                            MessageEnum.LIKE_VLOG.type,
+                            msgContent);
     }
 
     @Override

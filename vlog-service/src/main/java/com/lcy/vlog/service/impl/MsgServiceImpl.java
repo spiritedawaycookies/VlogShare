@@ -14,10 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MsgServiceImpl extends BaseInfoProperties implements MsgService {
@@ -69,7 +66,7 @@ public class MsgServiceImpl extends BaseInfoProperties implements MsgService {
                                                                 pageable);
         for (MessageMO msg : list) {
             // 如果类型是关注消息，则需要查询我之前有没有关注过他，用于在前端标记“互粉”“互关”
-            if (msg.getMsgType() != null && msg.getMsgType() == MessageEnum.FOLLOW_YOU.type) {
+            if (msg.getMsgType() != null && Objects.equals(msg.getMsgType(), MessageEnum.FOLLOW_YOU.type)) {
                 Map map = msg.getMsgContent();
                 if (map == null) {
                     map = new HashMap();

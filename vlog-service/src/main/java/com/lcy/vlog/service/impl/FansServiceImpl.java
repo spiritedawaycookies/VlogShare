@@ -68,7 +68,7 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
 
         // 系统消息：关注
-        // msgService.createMsg(myId, vlogerId, MessageEnum.FOLLOW_YOU.type, null);
+         msgService.createMsg(myId, vlogerId, MessageEnum.FOLLOW_YOU.type, null);
     }
 
     public Fans queryFansRelationship(String fanId, String vlogerId) {

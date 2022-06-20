@@ -32,6 +32,9 @@ public enum ResponseStatusEnum {
     FILE_NOT_EXIST_ERROR(514, false, "Requested file not exists"),
     USER_STATUS_ERROR(515, false, "User status error"),
     USER_NOT_EXIST_ERROR(516, false, "User doesn't exist"),
+    ITEM_NOT_EXIST_ERROR(517, false, "Request item doesn't exist"),
+    TITLE_CANNOT_BE_NULL_ERROR(517, false, "Title cannot be null"),
+
 
     // 自定义系统级别异常 54x
     SYSTEM_INDEX_OUT_OF_BOUNDS(541, false, "System index out of bounds"),

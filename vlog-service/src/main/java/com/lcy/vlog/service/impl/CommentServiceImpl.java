@@ -5,6 +5,9 @@ import com.lcy.vlog.base.BaseInfoProperties;
 import com.lcy.vlog.bo.CommentBO;
 import com.lcy.vlog.enums.MessageEnum;
 import com.lcy.vlog.enums.YesOrNo;
+import com.lcy.vlog.exceptions.GracefulException;
+import com.lcy.vlog.exceptions.MyCustomException;
+import com.lcy.vlog.graceful.result.ResponseStatusEnum;
 import com.lcy.vlog.mapper.CommentMapper;
 import com.lcy.vlog.mapper.CommentMapperCustom;
 import com.lcy.vlog.pojo.Comment;
@@ -46,7 +49,9 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
     public CommentVO createComment(CommentBO commentBO) {
 
         String commentId = sid.nextShort();
-
+        if (commentBO.getCommentUserId() == null||commentBO.getVlogerId()==null ) {
+            throw new MyCustomException(ResponseStatusEnum.USER_STATUS_ERROR);
+        }
         Comment comment = new Comment();
         comment.setId(commentId);
 
@@ -70,7 +75,6 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
         BeanUtils.copyProperties(comment, commentVO);
 
 
-
         // 系统消息：评论/回复
         Vlog vlog = vlogService.getVlog(commentBO.getVlogId());
         Map msgContent = new HashMap();
@@ -90,7 +94,6 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
                 msgContent);
 
 
-
         return commentVO;
     }
 
@@ -107,11 +110,11 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
 
         List<CommentVO> list = commentMapperCustom.getCommentList(map);
 
-        for (CommentVO cv:list) {
+        for (CommentVO cv : list) {
             String commentId = cv.getCommentId();
 
             // 当前短视频的某个评论的点赞总数
-            String countsStr = redis.getHashValue(REDIS_VLOG_COMMENT_LIKED_COUNTS, commentId);
+            String countsStr = redis.get(REDIS_VLOG_COMMENT_LIKED_COUNTS+":"+commentId);
             Integer counts = 0;
             if (StringUtils.isNotBlank(countsStr)) {
                 counts = Integer.valueOf(countsStr);
@@ -119,7 +122,7 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
             cv.setLikeCounts(counts);
 
             // 判断当前用户是否点赞过该评论
-            String doILike = redis.hget(REDIS_USER_LIKE_COMMENT, userId + ":" + commentId);
+            String doILike = redis.get(REDIS_USER_LIKE_COMMENT+":"+userId + ":" + commentId);
             if (StringUtils.isNotBlank(doILike) && doILike.equalsIgnoreCase("1")) {
                 cv.setIsLike(YesOrNo.YES.type);
             }
