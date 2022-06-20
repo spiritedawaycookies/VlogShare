@@ -81,4 +81,5 @@ public interface VlogService {
      * 根据主键查询vlog
      */
     public Vlog getVlog(String id);
+
 }

@@ -9,6 +9,7 @@ import com.lcy.vlog.service.VlogService;
 import com.lcy.vlog.utils.PagedGridResult;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -147,6 +148,21 @@ public class VlogController extends BaseInfoProperties {
 
         // 我点赞的视频，需要在redis中保存关联关系
         redis.set(REDIS_USER_LIKE_VLOG + ":" + userId + ":" + vlogId, "1");
+
+        // 点赞完毕，获得当前在redis中的总数
+        // 比如获得总计数为 1k/1w/10w，假定阈值（配置）为2000
+        // 此时1k满足2000，则触发入库 (弱一致性)
+
+        String countsStr = redis.get(REDIS_VLOG_BE_LIKED_COUNTS + ":" + vlogId);
+        log.info("======" + REDIS_VLOG_BE_LIKED_COUNTS + ":" + vlogId + "======");
+        Integer counts = 0;
+//        if (StringUtils.isNotBlank(countsStr)) {
+//            counts = Integer.valueOf(countsStr);
+//            if (counts >= nacosCounts) {
+//                vlogService.flushCounts(vlogId, counts);
+//            }
+//        }
+//
 
         return GracefulJSONResult.ok();
     }
